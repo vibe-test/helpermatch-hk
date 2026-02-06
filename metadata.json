@@ -1,0 +1,8 @@
+
+{
+  "name": "HelperMatch HK - Domestic Helper Platform",
+  "description": "A professional platform for finding domestic helpers, caregivers, and drivers in Hong Kong, featuring AI-powered matching and job description generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
