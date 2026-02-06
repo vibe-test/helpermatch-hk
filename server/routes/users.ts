@@ -1,5 +1,5 @@
 import express from 'express';
-import db from '../db';
+import { supabase } from '../db';
 import { z } from 'zod';
 
 const router = express.Router();
@@ -13,44 +13,83 @@ const UserUpdateSchema = z.object({
     canViewJobs: z.union([z.boolean(), z.number()]).optional(),
 });
 
-router.get('/', (req, res) => {
-    const users = db.prepare('SELECT id, name, email, role, status, canViewHelpers, canViewJobs, createdAt FROM users ORDER BY createdAt DESC, id DESC').all();
-    res.json(users);
-});
+router.get('/', async (req, res) => {
+    try {
+        const { data: users, error } = await supabase
+            .from('users')
+            .select('id, name, email, role, status, canViewHelpers, canViewJobs, createdAt')
+            .order('createdAt', { ascending: false });
 
-router.get('/:id', (req, res) => {
-    const user = db.prepare('SELECT id, name, email, role, status, canViewHelpers, canViewJobs FROM users WHERE id = ?').get(req.params.id);
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(404).json({ error: 'User not found' });
+        if (error) throw error;
+        res.json(users || []);
+    } catch (error: any) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
-router.put('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
+    try {
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('id, name, email, role, status, canViewHelpers, canViewJobs')
+            .eq('id', req.params.id)
+            .single();
+
+        if (error) throw error;
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.put('/:id', async (req, res) => {
     try {
         const body = UserUpdateSchema.parse(req.body);
-        const canViewHelpers = body.canViewHelpers === true || body.canViewHelpers === 1 ? 1 : 0;
-        const canViewJobs = body.canViewJobs === true || body.canViewJobs === 1 ? 1 : 0;
+        const canViewHelpers = body.canViewHelpers === true || body.canViewHelpers === 1;
+        const canViewJobs = body.canViewJobs === true || body.canViewJobs === 1;
 
-        const result = db.prepare('UPDATE users SET name = ?, email = ?, role = ?, status = ?, canViewHelpers = ?, canViewJobs = ? WHERE id = ?')
-            .run(body.name, body.email, body.role, body.status, canViewHelpers, canViewJobs, req.params.id);
+        const { data, error } = await supabase
+            .from('users')
+            .update({
+                name: body.name,
+                email: body.email,
+                role: body.role,
+                status: body.status,
+                canViewHelpers,
+                canViewJobs
+            })
+            .eq('id', req.params.id)
+            .select();
 
-        if (result.changes === 0) {
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json({ id: req.params.id, ...body });
-    } catch (error) {
-        res.status(400).json({ error: 'Invalid input' });
+        res.json(data[0]);
+    } catch (error: any) {
+        res.status(400).json({ error: error.message || 'Invalid input' });
     }
 });
 
-router.delete('/:id', (req, res) => {
-    const result = db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
-    if (result.changes === 0) {
-        return res.status(404).json({ error: 'User not found' });
+router.delete('/:id', async (req, res) => {
+    try {
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', req.params.id);
+
+        if (error) throw error;
+        res.json({ message: 'User deleted successfully' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
     }
-    res.json({ message: 'User deleted successfully' });
 });
 
 export default router;
+
