@@ -9,11 +9,11 @@ export const MOCK_HELPERS: HelperProfile[] = [
     nationality: Nationality.FILIPINO,
     experience: Experience.FINISHED,
     salary: 4870,
-    skills: ['煮飯', '照顧小孩', '打掃', '照顧寵物'],
-    languages: ['英語', '廣東話 (基礎)'],
+    skills: ['Cooking', 'Childcare', 'Cleaning', 'Pet Care'],
+    languages: ['English', 'Cantonese (Basic)'],
     imageUrl: 'https://picsum.photos/seed/maria/400/500',
     availability: '2024-05-15',
-    description: '我有8年在香港工作的經驗，擅長烹飪中餐及西餐。我非常喜歡小孩子，處事細心。'
+    description: 'I have 8 years of experience in Hong Kong, specializing in cooking Chinese and Western dishes. I love children and am very careful.'
   },
   {
     id: '2',
@@ -22,11 +22,11 @@ export const MOCK_HELPERS: HelperProfile[] = [
     nationality: Nationality.INDONESIAN,
     experience: Experience.EX_HK,
     salary: 5000,
-    skills: ['煮飯', '照顧老人', '打掃'],
-    languages: ['廣東話 (流利)', '印尼語'],
+    skills: ['Cooking', 'Elderly Care', 'Cleaning'],
+    languages: ['Cantonese (Fluent)', 'Indonesian'],
     imageUrl: 'https://picsum.photos/seed/siti/400/500',
-    availability: '隨時',
-    description: '曾在香港工作4年，主攻照顧老人及家務管理。廣東話溝通無障礙。'
+    availability: 'Immediate',
+    description: 'Worked in Hong Kong for 4 years, focusing on elderly care and household management. Fluent in Cantonese.'
   },
   {
     id: '3',
@@ -35,11 +35,11 @@ export const MOCK_HELPERS: HelperProfile[] = [
     nationality: Nationality.MYANMAR,
     experience: Experience.NEW,
     salary: 4870,
-    skills: ['照顧小孩', '打掃', '洗熨'],
-    languages: ['英語 (良好)', '緬甸語'],
+    skills: ['Childcare', 'Cleaning', 'Laundry'],
+    languages: ['English (Good)', 'Burmese'],
     imageUrl: 'https://picsum.photos/seed/lwin/400/500',
     availability: '2024-06-01',
-    description: '勤奮好學，態度誠懇。曾在新加坡工作過1年，對家務有基本認識。'
+    description: 'Hardworking and sincere. Worked in Singapore for 1 year, basic knowledge of housework.'
   },
   {
     id: '4',
@@ -48,31 +48,35 @@ export const MOCK_HELPERS: HelperProfile[] = [
     nationality: Nationality.FILIPINO,
     experience: Experience.FINISHED,
     salary: 5500,
-    skills: ['專業烹飪', '照顧新生兒', '護理經驗'],
-    languages: ['英語 (流利)'],
+    skills: ['Professional Cooking', 'Newborn Care', 'Nursing Experience'],
+    languages: ['English (Fluent)'],
     imageUrl: 'https://picsum.photos/seed/analyn/400/500',
     availability: '2024-05-20',
-    description: '擁有護理背景，特別擅長照顧剛出生的嬰兒。熟悉各類中西食譜。'
+    description: 'Nursing background, specialized in newborn care. Familiar with various Chinese and Western recipes.'
   }
 ];
 
 export const MOCK_JOBS: JobPost[] = [
   {
     id: 'j1',
-    title: '尋找有經驗女傭 (將軍澳)',
-    location: '將軍澳',
+    title: 'Seeking Experienced Helper (Tseung Kwan O)',
+    location: 'Tseung Kwan O',
     salary: 'HK$ 5,000 - 6,000',
-    requirements: ['煮飯', '照顧2名小孩'],
-    postedAt: '2小時前',
-    description: '我們是一個四口之家，需要一名誠實、有責任感的女傭負責家務及接送小孩。'
+    requirements: ['Cooking', 'Take care of 2 children'],
+    postedAt: '2 hours ago',
+    expiryDate: '',
+    status: 'approved',
+    description: 'We are a family of four, need an honest and responsible helper for housework and children pick-up.'
   },
   {
     id: 'j2',
-    title: '需要擅長煮食女傭 (半山區)',
-    location: '中半山',
+    title: 'Experienced Cook Needed (Mid-Levels)',
+    location: 'Mid-Levels',
     salary: 'HK$ 6,500+',
-    requirements: ['精通中餐', '照顧寵物'],
-    postedAt: '5小時前',
-    description: '僱主對食物質素有要求，需獨立管理大屋家務，另需遛狗。'
+    requirements: ['Fluent in Chinese cooking', 'Pet care'],
+    postedAt: '5 hours ago',
+    expiryDate: '',
+    status: 'approved',
+    description: 'Employer has high standards for food quality, need independent management of household chores and dog walking.'
   }
 ];

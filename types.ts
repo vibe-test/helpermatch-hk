@@ -1,17 +1,17 @@
 
 export enum Nationality {
-  FILIPINO = '菲律賓',
-  INDONESIAN = '印尼',
-  THAI = '泰國',
-  MYANMAR = '緬甸',
-  LOCAL = '本地'
+  FILIPINO = 'Filipino',
+  INDONESIAN = 'Indonesian',
+  THAI = 'Thai',
+  MYANMAR = 'Myanmar',
+  LOCAL = 'Local'
 }
 
 export enum Experience {
-  NEW = '新到港',
-  FINISHED = '完約',
-  EX_HK = '曾獲聘用',
-  EX_ABROAD = '海外經驗'
+  NEW = 'New to HK',
+  FINISHED = 'Finished Contract',
+  EX_HK = 'Ex-HK',
+  EX_ABROAD = 'Overseas Experience'
 }
 
 export interface HelperProfile {

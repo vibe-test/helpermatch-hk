@@ -48,7 +48,7 @@ const App: React.FC = () => {
       });
 
       if (response.ok) {
-        alert('招聘廣告已提交！管理員將會進行審核，審核通過後即可顯示。');
+        alert('Job post submitted! It will be visible after admin approval.');
         setCurrentView('HOME');
       } else {
         console.error('Failed to post job');

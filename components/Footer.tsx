@@ -19,33 +19,33 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <span className="text-white text-xl font-bold">HelperMatch</span>
             </div>
             <p className="text-sm leading-relaxed">
-              香港領先的家庭傭工對接平台，致力於透過透明的信息和先進的技術，為每個家庭找到最合適的幫手。
+              HK's leading domestic helper platform, dedicated to finding the perfect match for every family through transparency and advanced technology.
             </p>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-6">快速連結</h4>
+            <h4 className="text-white font-bold mb-6">Quick Links</h4>
             <ul className="space-y-4 text-sm">
-              <li><button onClick={() => onNavigate('SEARCH_HELPERS')} className="hover:text-white transition">尋找女傭</button></li>
-              <li><button onClick={() => onNavigate('SEARCH_JOBS')} className="hover:text-white transition">尋找工作</button></li>
-              <li><button onClick={() => onNavigate('POST_JOB')} className="hover:text-white transition">刊登招聘</button></li>
-              <li><button onClick={() => onNavigate('AI_MATCH')} className="hover:text-white transition text-pink-500">AI 智能配對</button></li>
+              <li><button onClick={() => onNavigate('SEARCH_HELPERS')} className="hover:text-white transition">Find Helpers</button></li>
+              <li><button onClick={() => onNavigate('SEARCH_JOBS')} className="hover:text-white transition">Find Jobs</button></li>
+              <li><button onClick={() => onNavigate('POST_JOB')} className="hover:text-white transition">Post a Job</button></li>
+              <li><button onClick={() => onNavigate('AI_MATCH')} className="hover:text-white transition text-pink-500">AI Smart Match</button></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-6">常見問題</h4>
+            <h4 className="text-white font-bold mb-6">FAQ</h4>
             <ul className="space-y-4 text-sm">
-              <li><a href="#" className="hover:text-white transition">如何面試女傭？</a></li>
-              <li><a href="#" className="hover:text-white transition">合約及保險資訊</a></li>
-              <li><a href="#" className="hover:text-white transition">收費詳情</a></li>
-              <li><a href="#" className="hover:text-white transition">中介服務條款</a></li>
+              <li><a href="#" className="hover:text-white transition">How to interview?</a></li>
+              <li><a href="#" className="hover:text-white transition">Contract & Insurance</a></li>
+              <li><a href="#" className="hover:text-white transition">Pricing Details</a></li>
+              <li><a href="#" className="hover:text-white transition">Terms of Service</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-bold mb-6">聯絡我們</h4>
+            <h4 className="text-white font-bold mb-6">Contact Us</h4>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-2">
                 <span>📍</span>
-                <span>香港中環德輔道中...</span>
+                <span>Des Voeux Road Central, HK</span>
               </li>
               <li className="flex items-start gap-2">
                 <span>📧</span>
@@ -59,7 +59,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
         </div>
         <div className="pt-8 border-t border-gray-800 text-center text-xs">
-          <p>© 2024 HelperMatch HK. All rights reserved. 勞工處牌照號碼: 12345678</p>
+          <p>© 2024 HelperMatch HK. All rights reserved. Labour Dept License: 12345678</p>
         </div>
       </div>
     </footer>

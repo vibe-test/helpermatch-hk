@@ -28,8 +28,8 @@ router.post('/match', async (req, res) => {
         const response = await ai.models.generateContent({
             model: 'gemini-2.0-flash-exp',
             contents: `User is looking for a domestic helper with these criteria: "${userInput}". 
-            Analyze the request and return a JSON object with predicted filter parameters: nationality (one of: 菲律賓, 印尼, 泰國, 緬甸, 本地), 
-            experience (one of: 新到港, 完約, 曾獲聘用, 海外經驗), and a list of key skills mentioned.`,
+            Analyze the request and return a JSON object with predicted filter parameters: nationality (one of: Filipino, Indonesian, Thai, Myanmar, Local), 
+            experience (one of: New to HK, Finished Contract, Ex-HK, Overseas Experience), and a list of key skills mentioned.`,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -41,7 +41,7 @@ router.post('/match', async (req, res) => {
                             type: Type.ARRAY,
                             items: { type: Type.STRING }
                         },
-                        summary: { type: Type.STRING, description: "A friendly summary of what they are looking for in Traditional Chinese." }
+                        summary: { type: Type.STRING, description: "A friendly summary of what they are looking for in English." }
                     },
                     required: ["nationality", "experience", "skills", "summary"]
                 }
@@ -75,8 +75,8 @@ router.post('/generate-job-description', async (req, res) => {
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.0-flash-exp',
-            contents: `Generate a professional domestic helper job description in Traditional Chinese based on these notes: "${details}". 
-            Include sections for: 職位概覽, 主要職責, 要求, 及待遇。 Ensure it sounds encouraging and professional.`,
+            contents: `Generate a professional domestic helper job description in English based on these notes: "${details}". 
+            Include sections for: Job Overview, Main Responsibilities, Requirements, and Compensation. Ensure it sounds encouraging and professional.`,
         });
 
         res.json({ description: response.text });

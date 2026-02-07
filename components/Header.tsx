@@ -50,26 +50,26 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                 onClick={() => onNavigate('SEARCH_HELPERS')}
                 className={`${currentView === 'SEARCH_HELPERS' ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-500 font-medium`}
               >
-                找女傭
+                Find Helpers
               </button>
               <button
                 onClick={() => onNavigate('SEARCH_JOBS')}
                 className={`${currentView === 'SEARCH_JOBS' ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-500 font-medium`}
               >
-                找工作
+                Find Jobs
               </button>
               <button
                 onClick={() => onNavigate('AI_MATCH')}
                 className="text-pink-600 hover:text-pink-500 font-bold flex items-center gap-1"
               >
-                <span className="animate-pulse">✨</span> AI 智能匹配
+                <span className="animate-pulse">✨</span> AI Match
               </button>
               {user?.role === 'admin' && (
                 <button
                   onClick={() => onNavigate('ADMIN')}
                   className={`${currentView === 'ADMIN' ? 'text-blue-600' : 'text-purple-600'} hover:text-purple-500 font-bold flex items-center gap-1`}
                 >
-                  ⚙️ 管理
+                  ⚙️ Admin
                 </button>
               )}
             </nav>
@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                 onClick={() => onNavigate('POST_JOB')}
                 className="hidden sm:block bg-blue-600 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-700 transition"
               >
-                刊登招聘廣告
+                Post Job
               </button>
 
               {user ? (
@@ -93,7 +93,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                   <button
                     onClick={handleLogout}
                     className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                    title="登出"
+                    title="Logout"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                   onClick={() => setIsLoginModalOpen(true)}
                   className="text-gray-600 font-medium hover:text-blue-600 transition"
                 >
-                  登入
+                  Login
                 </button>
               )}
 
@@ -121,10 +121,10 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 p-4 space-y-4 shadow-lg">
-            <button onClick={() => { onNavigate('SEARCH_HELPERS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">找女傭</button>
-            <button onClick={() => { onNavigate('SEARCH_JOBS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">找工作</button>
-            <button onClick={() => { onNavigate('AI_MATCH'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-pink-600">AI 智能匹配</button>
-            <button onClick={() => { onNavigate('POST_JOB'); setIsMenuOpen(false); }} className="block w-full bg-blue-600 text-white p-2 rounded-md text-center">刊登招聘廣告</button>
+            <button onClick={() => { onNavigate('SEARCH_HELPERS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Helpers</button>
+            <button onClick={() => { onNavigate('SEARCH_JOBS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Jobs</button>
+            <button onClick={() => { onNavigate('AI_MATCH'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-pink-600">AI Match</button>
+            <button onClick={() => { onNavigate('POST_JOB'); setIsMenuOpen(false); }} className="block w-full bg-blue-600 text-white p-2 rounded-md text-center">Post Job</button>
             {user && (
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                 <span className="font-bold text-gray-900">{user.name}</span>
@@ -132,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                   onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                   className="text-red-500 font-bold"
                 >
-                  登出
+                  Logout
                 </button>
               </div>
             )}

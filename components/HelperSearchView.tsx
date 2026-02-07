@@ -48,7 +48,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
     checkApprovalAndFetch();
   }, [user]);
 
-  if (loading) return <div className="p-20 text-center font-bold">載入中...</div>;
+  if (loading) return <div className="p-20 text-center font-bold">Loading...</div>;
 
   if (!isApprovedByContent) {
     return (
@@ -59,25 +59,25 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">存取受限</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Access Restricted</h2>
           <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            為了保護姐姐的隱私，只有經管理員驗證並 **「獲准查看」** 的帳號才可以查看姐姐的詳細資料。
+            To protect helper privacy, only accounts verified by the admin and **"approved to view"** can see helper details.
           </p>
           {!user ? (
-            <p className="text-blue-600 font-bold text-lg">請先點擊頁面右上方的「登入/註冊」</p>
+            <p className="text-blue-600 font-bold text-lg">Please click "Login" in the top right corner.</p>
           ) : (
             <div className="space-y-4">
               <div className="bg-gray-50 p-4 rounded-xl text-sm text-left inline-block">
-                <p><strong>目前帳號資訊：</strong></p>
-                <p>電郵：{user.email}</p>
-                <p>身份：{user.role === 'employer' ? '僱主' : user.role === 'helper' ? '姐姐' : user.role}</p>
+                <p><strong>Current Account Info:</strong></p>
+                <p>Email: {user.email}</p>
+                <p>Role: {user.role === 'employer' ? 'Employer' : user.role === 'helper' ? 'Helper' : user.role}</p>
               </div>
 
               {user.role === 'employer' ? (
                 <div className="space-y-4">
                   <div className="bg-yellow-50 text-yellow-800 p-6 rounded-2xl font-medium border border-yellow-100">
-                    為了保護姐姐隱私，僱主必須至少有一個 **「已通過審核」** 的招聘廣告，才可以查看姐姐資料。<br />
-                    如果您尚未刊登，請點擊上方「刊登招聘廣告」；如果已刊登，請耐心等候管理員審核。
+                    To protect helper privacy, employers must have at least one **"approved"** job posting to view helper details.<br />
+                    If you haven't posted yet, please click "Post Job". If you have, please wait for admin approval.
                   </div>
                 </div>
               ) : null}
@@ -99,10 +99,10 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
         {/* Sidebar Filters */}
         <aside className="w-full md:w-64 space-y-8">
           <div>
-            <h3 className="text-lg font-bold mb-4">篩選條件</h3>
+            <h3 className="text-lg font-bold mb-4">Filters</h3>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">國籍</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nationality</label>
                 <select
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border"
                   value={filters.nationality}
@@ -113,7 +113,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">經驗</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
                 <select
                   className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border"
                   value={filters.experience}
@@ -126,16 +126,16 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
             </div>
           </div>
           <div className="p-4 bg-blue-50 rounded-xl">
-            <p className="text-sm text-blue-800 font-medium">找不到合適的人選？</p>
-            <p className="text-xs text-blue-600 mt-1">試試我們的 AI 智能配對功能，讓我們為您推薦。</p>
+            <p className="text-sm text-blue-800 font-medium">Can't find a suitable candidate?</p>
+            <p className="text-xs text-blue-600 mt-1">Try our AI Smart Match feature to get recommendations.</p>
           </div>
         </aside>
 
         {/* Results Grid */}
         <div className="flex-1">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">搜尋結果 ({filteredHelpers.length})</h2>
-            <div className="text-sm text-gray-500">排序: 最新優先</div>
+            <h2 className="text-2xl font-bold">Search Results ({filteredHelpers.length})</h2>
+            <div className="text-sm text-gray-500">Sort: Newest First</div>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -150,7 +150,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 <div className="p-5 flex-grow">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold">{helper.name}</h3>
-                    <span className="text-gray-500 text-sm">{helper.age}歲</span>
+                    <span className="text-gray-500 text-sm">{helper.age} years old</span>
                   </div>
                   <div className="text-blue-600 font-medium text-sm mb-4">{helper.nationality}</div>
 
@@ -167,11 +167,11 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 </div>
                 <div className="p-5 border-t border-gray-100 flex items-center justify-between">
                   <div>
-                    <div className="text-xs text-gray-400">薪資要求</div>
+                    <div className="text-xs text-gray-400">Expected Salary</div>
                     <div className="font-bold text-gray-900">HK$ {helper.salary}</div>
                   </div>
                   <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition">
-                    查看檔案
+                    View Profile
                   </button>
                 </div>
               </div>

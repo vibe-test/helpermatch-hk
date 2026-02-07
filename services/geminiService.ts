@@ -37,6 +37,6 @@ export const generateJobDescription = async (details: string) => {
     return data.description;
   } catch (error) {
     console.error("Gemini Job Gen Error:", error);
-    return "無法生成描述，請手動輸入。";
+    return "Failed to generate description, please enter manually.";
   }
 };
