@@ -108,7 +108,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                   value={filters.nationality}
                   onChange={(e) => setFilters({ ...filters, nationality: e.target.value })}
                 >
-                  <option value="ALL">全部</option>
+                  <option value="ALL">All</option>
                   {Object.values(Nationality).map(n => <option key={n} value={n}>{n}</option>)}
                 </select>
               </div>
@@ -119,7 +119,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                   value={filters.experience}
                   onChange={(e) => setFilters({ ...filters, experience: e.target.value })}
                 >
-                  <option value="ALL">全部</option>
+                  <option value="ALL">All</option>
                   {Object.values(Experience).map(exp => <option key={exp} value={exp}>{exp}</option>)}
                 </select>
               </div>

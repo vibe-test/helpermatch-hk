@@ -18,9 +18,9 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
           if (user.role === 'admin') {
             setIsApprovedByContent(true);
           } else if (user.role === 'employer') {
-            setIsApprovedByContent(true); // 僱主隨時可以睇招聘資料 (自己類別)
+            setIsApprovedByContent(true); // Employers can always view job postings (their own category)
           } else if (user.role === 'helper') {
-            // 使用管理員設定的個人權限開關
+            // Use the individual permission switch set by the admin
             const canView = user.canViewJobs === 1 || user.canViewJobs === true;
             setIsApprovedByContent(canView);
           }
