@@ -73,11 +73,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const body = HelperSchema.parse(req.body);
-        const id = `h-${Date.now()}`;
         const newHelper = {
-            id,
             ...body,
             status: 'pending'
+            // id will be handled by Supabase default (UUID)
         };
 
         const { data, error } = await supabase.from('helpers').insert([newHelper]).select();

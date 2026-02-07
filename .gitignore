@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 環境變量（敏感資料）
+.env
+server/.env
+.env.*
+# 本地資料庫
+*.db
+server/helpermatch.db
+# 操作系統與日誌
+server_log.txt

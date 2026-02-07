@@ -58,11 +58,9 @@ router.post('/', async (req, res) => {
     try {
         const body = JobSchema.parse(req.body);
         const newJob = {
-            id: `j-${Date.now()}`,
-            postedAt: '剛剛',
             ...body,
             status: 'pending',
-            // requirements is stored as JSONB in Supabase, so we pass it as an array directly
+            // id and createdAt will be handled by Supabase defaults
         };
 
         const { data, error } = await supabase.from('jobs').insert([newJob]).select();
