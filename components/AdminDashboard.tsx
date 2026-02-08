@@ -9,12 +9,18 @@ interface User {
 }
 
 const AdminDashboard: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'helpers' | 'jobs' | 'users'>('helpers');
+    const [activeTab, setActiveTab] = useState<'helpers' | 'jobs' | 'users' | 'settings'>('helpers');
     const [helpers, setHelpers] = useState<HelperProfile[]>([]);
     const [jobs, setJobs] = useState<JobPost[]>([]);
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ helpers: 0, jobs: 0, users: 0 });
+    const [settings, setSettings] = useState({
+        employerPrice: 38800,
+        helperPrice: 38800,
+        paymentEnabled: true,
+        membershipDurationDays: 365
+    });
 
     useEffect(() => {
         fetchData();
@@ -42,16 +48,30 @@ const AdminDashboard: React.FC = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const endpoint = `/api/${activeTab}${activeTab !== 'users' ? '?admin=true' : ''}`;
-            const response = await fetch(endpoint);
-            const data = await response.json();
-            if (activeTab === 'helpers') setHelpers(data);
-            else if (activeTab === 'jobs') setJobs(data);
-            else if (activeTab === 'users') setUsers(data);
+            if (activeTab === 'settings') {
+                await fetchSettings();
+            } else {
+                const endpoint = `/api/${activeTab}${activeTab !== 'users' ? '?admin=true' : ''}`;
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                if (activeTab === 'helpers') setHelpers(data);
+                else if (activeTab === 'jobs') setJobs(data);
+                else if (activeTab === 'users') setUsers(data);
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchSettings = async () => {
+        try {
+            const response = await fetch('/api/settings');
+            const data = await response.json();
+            setSettings(data);
+        } catch (error) {
+            console.error('Error fetching settings:', error);
         }
     };
 
@@ -215,6 +235,7 @@ const AdminDashboard: React.FC = () => {
                         <th className="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">User Info</th>
                         <th className="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Role & Status</th>
                         <th className="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Access Control</th>
+                        <th className="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider">Membership Expiry</th>
                         <th className="px-6 py-4 text-left font-bold text-gray-700 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
@@ -260,6 +281,16 @@ const AdminDashboard: React.FC = () => {
                                     )}
                                 </div>
                             </td>
+                            <td className="px-6 py-4">
+                                {user.membershipExpiry ? (
+                                    <div className="text-xs">
+                                        <div className="font-medium text-gray-900">{new Date(user.membershipExpiry).toLocaleDateString()}</div>
+                                        <div className="text-gray-500">{new Date(user.membershipExpiry) > new Date() ? 'Active' : 'Expired'}</div>
+                                    </div>
+                                ) : (
+                                    <span className="text-gray-400 text-xs">No membership</span>
+                                )}
+                            </td>
                             <td className="px-6 py-4 text-right space-x-2 text-xs">
                                 {user.status !== 'approved' && (
                                     <button
@@ -284,6 +315,90 @@ const AdminDashboard: React.FC = () => {
         </div>
     );
 
+    const renderSettings = () => (
+        <div className="p-8">
+            <div className="max-w-2xl mx-auto">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Payment System Settings</h3>
+                <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    try {
+                        const response = await fetch('/api/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(settings)
+                        });
+                        if (response.ok) {
+                            alert('Settings saved successfully!');
+                            fetchSettings();
+                        }
+                    } catch (error) {
+                        console.error('Error saving settings:', error);
+                        alert('Failed to save settings');
+                    }
+                }} className="space-y-6">
+                    <div className="bg-white p-6 rounded-xl border border-gray-200">
+                        <label className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-gray-900">Enable Payment System</span>
+                            <input
+                                type="checkbox"
+                                checked={settings.paymentEnabled}
+                                onChange={(e) => setSettings({ ...settings, paymentEnabled: e.target.checked })}
+                                className="w-6 h-6 text-blue-600 rounded"
+                            />
+                        </label>
+                        <p className="text-sm text-gray-500 mt-2">When disabled, users cannot make payments to unlock features</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 space-y-4">
+                        <h4 className="font-bold text-gray-900">Pricing (in HK$ cents)</h4>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Employer Price</label>
+                            <input
+                                type="number"
+                                value={settings.employerPrice}
+                                onChange={(e) => setSettings({ ...settings, employerPrice: Number(e.target.value) })}
+                                className="w-full p-3 border border-gray-300 rounded-lg"
+                                min="0"
+                                step="100"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Current: HK${(settings.employerPrice / 100).toFixed(2)}</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Helper Price</label>
+                            <input
+                                type="number"
+                                value={settings.helperPrice}
+                                onChange={(e) => setSettings({ ...settings, helperPrice: Number(e.target.value) })}
+                                className="w-full p-3 border border-gray-300 rounded-lg"
+                                min="0"
+                                step="100"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Current: HK${(settings.helperPrice / 100).toFixed(2)}</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-xl border border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Membership Duration (Days)</label>
+                        <input
+                            type="number"
+                            value={settings.membershipDurationDays}
+                            onChange={(e) => setSettings({ ...settings, membershipDurationDays: Number(e.target.value) })}
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                            min="1"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Membership will be valid for {settings.membershipDurationDays} days after payment</p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                    >
+                        Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this item?')) return;
@@ -386,6 +501,16 @@ const AdminDashboard: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">Membership Expiry Date</label>
+                                        <input
+                                            name="membershipExpiry"
+                                            type="datetime-local"
+                                            defaultValue={editingItem?.membershipExpiry ? new Date(editingItem.membershipExpiry).toISOString().slice(0, 16) : ''}
+                                            className="w-full p-3 border rounded-xl"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Leave empty for no expiry</p>
+                                    </div>
                                 </>
                             )}
                             <div className="pt-4">
@@ -428,7 +553,7 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="flex space-x-6 mb-8 border-b border-gray-100">
-                {(['helpers', 'jobs', 'users'] as const).map(tab => (
+                {(['helpers', 'jobs', 'users', 'settings'] as const).map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -462,6 +587,7 @@ const AdminDashboard: React.FC = () => {
                             {activeTab === 'helpers' && renderHelpers()}
                             {activeTab === 'jobs' && renderJobs()}
                             {activeTab === 'users' && renderUsers()}
+                            {activeTab === 'settings' && renderSettings()}
                         </div>
                     </>
                 )}

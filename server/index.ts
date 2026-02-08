@@ -8,6 +8,7 @@ import aiRoutes from './routes/ai';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
 import paymentRoutes from './routes/payments';
+import settingsRoutes from './routes/settings';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

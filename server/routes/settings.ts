@@ -1,43 +1,85 @@
 import express from 'express';
 import { supabase } from '../db';
+import { z } from 'zod';
 
 const router = express.Router();
 
+const SettingsSchema = z.object({
+    employerPrice: z.number().min(0),
+    helperPrice: z.number().min(0),
+    paymentEnabled: z.boolean(),
+    membershipDurationDays: z.number().min(1)
+});
+
+// Get system settings
 router.get('/', async (req, res) => {
     try {
         const { data: settings, error } = await supabase
             .from('settings')
-            .select('*');
+            .select('*')
+            .single();
 
-        if (error) {
-            // If table doesn't exist yet, return empty object instead of 500
-            if (error.code === '42P01') return res.json({});
+        if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
             throw error;
         }
 
-        const result = (settings || []).reduce((acc: any, s) => {
-            acc[s.key] = s.value === 'true';
-            return acc;
-        }, {});
-        res.json(result);
+        // Return default settings if none exist
+        if (!settings) {
+            return res.json({
+                employerPrice: 38800, // HK$388 in cents
+                helperPrice: 38800,
+                paymentEnabled: true,
+                membershipDurationDays: 365
+            });
+        }
+
+        res.json(settings);
     } catch (error: any) {
+        console.error('Error fetching settings:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-router.post('/', async (req, res) => {
+// Update system settings
+router.put('/', async (req, res) => {
     try {
-        const { key, value } = req.body;
-        const { error } = await supabase
-            .from('settings')
-            .upsert({ key, value: String(value) }, { onConflict: 'key' });
+        const body = SettingsSchema.parse(req.body);
 
-        if (error) throw error;
-        res.json({ success: true });
+        // Check if settings exist
+        const { data: existing } = await supabase
+            .from('settings')
+            .select('id')
+            .single();
+
+        let result;
+        if (existing) {
+            // Update existing settings
+            const { data, error } = await supabase
+                .from('settings')
+                .update(body)
+                .eq('id', existing.id)
+                .select()
+                .single();
+
+            if (error) throw error;
+            result = data;
+        } else {
+            // Insert new settings
+            const { data, error } = await supabase
+                .from('settings')
+                .insert([body])
+                .select()
+                .single();
+
+            if (error) throw error;
+            result = data;
+        }
+
+        res.json(result);
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+        console.error('Error updating settings:', error);
+        res.status(400).json({ error: error.message || 'Invalid input' });
     }
 });
 
 export default router;
-

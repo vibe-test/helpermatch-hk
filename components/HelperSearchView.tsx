@@ -10,6 +10,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
   const [helpers, setHelpers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isApprovedByContent, setIsApprovedByContent] = useState(false);
+  const [price, setPrice] = useState(388); // Default price in HKD
   const [filters, setFilters] = useState({
     nationality: 'ALL',
     experience: 'ALL'
@@ -38,6 +39,15 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
         const resHelpers = await fetch(`/api/helpers?role=${user?.role || ''}&viewerId=${user?.id || ''}`);
         const data = await resHelpers.json();
         setHelpers(data);
+
+        // 3. Fetch pricing from settings
+        try {
+          const resSettings = await fetch('/api/settings');
+          const settings = await resSettings.json();
+          setPrice((settings.employerPrice || 38800) / 100); // Convert cents to HKD
+        } catch (err) {
+          console.error('Error fetching settings:', err);
+        }
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -103,7 +113,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                       }}
                       className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition"
                     >
-                      Upgrade for HK$388
+                      Upgrade for HK${price}
                     </button>
                   </div>
                 </div>

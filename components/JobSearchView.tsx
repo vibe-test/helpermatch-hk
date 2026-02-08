@@ -9,6 +9,7 @@ interface JobSearchViewProps {
 const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
   const [loading, setLoading] = useState(true);
   const [isApprovedByContent, setIsApprovedByContent] = useState(false);
+  const [price, setPrice] = useState(388); // Default price in HKD
 
   useEffect(() => {
     const checkApproval = async () => {
@@ -32,7 +33,18 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
       }
     };
 
+    const fetchPrice = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        const settings = await res.json();
+        setPrice((settings.helperPrice || 38800) / 100); // Convert cents to HKD
+      } catch (err) {
+        console.error('Error fetching settings:', err);
+      }
+    };
+
     checkApproval();
+    fetchPrice();
   }, [user]);
 
   if (loading) return <div className="p-20 text-center font-bold">Loading...</div>;
@@ -90,7 +102,7 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
                       }}
                       className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition"
                     >
-                      Upgrade for HK$388
+                      Upgrade for HK${price}
                     </button>
                   </div>
                 </div>

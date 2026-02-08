@@ -11,7 +11,7 @@ const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 // If no key is provided, we can log a warning or return an error on usage, 
 // but we should still initialize the router so the server doesn't crash.
 const stripe = stripeKey ? new Stripe(stripeKey, {
-    apiVersion: '2025-01-27.acacia', // Use latest API version or let it default if unsure
+    apiVersion: '2026-01-28.clover',
 }) : null;
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -22,11 +22,47 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 
     try {
-        const { userId, planId } = req.body; // planId could be 'premium_monthly' etc.
+        const { userId, planId } = req.body;
 
         if (!userId) {
             return res.status(400).json({ error: 'User ID is required' });
         }
+
+        // Fetch system settings
+        const { data: settings } = await supabase
+            .from('settings')
+            .select('*')
+            .single();
+
+        // Default settings if none exist
+        const employerPrice = settings?.employerPrice || 38800;
+        const helperPrice = settings?.helperPrice || 38800;
+        const paymentEnabled = settings?.paymentEnabled !== false; // default true
+
+        if (!paymentEnabled) {
+            return res.status(403).json({ error: 'Payment system is currently disabled' });
+        }
+
+        // Get user to determine role
+        const { data: user } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', userId)
+            .single();
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Determine price based on role
+        const isHelper = user.role === 'helper' || planId === 'premium_helper';
+        const price = isHelper ? helperPrice : employerPrice;
+        const productName = isHelper
+            ? 'Premium Access - View All Jobs'
+            : 'Premium Access - View All Helpers';
+        const productDescription = isHelper
+            ? 'Unlocks full access to job postings'
+            : 'Unlocks full access to helper profiles';
 
         // Create a Checkout Session
         const session = await stripe.checkout.sessions.create({
@@ -36,10 +72,10 @@ router.post('/create-checkout-session', async (req, res) => {
                     price_data: {
                         currency: 'hkd',
                         product_data: {
-                            name: 'Premium Access - View All Helpers',
-                            description: 'Unlocks full access to helper profiles',
+                            name: productName,
+                            description: productDescription,
                         },
-                        unit_amount: 38800, // Amount in cents (HK$388.00)
+                        unit_amount: price,
                     },
                     quantity: 1,
                 },
@@ -49,7 +85,7 @@ router.post('/create-checkout-session', async (req, res) => {
             cancel_url: `${FRONTEND_URL}/payment/cancel`,
             metadata: {
                 userId: userId.toString(),
-                type: 'unlock_helper_view'
+                type: isHelper ? 'unlock_job_view' : 'unlock_helper_view'
             },
         });
 
@@ -80,10 +116,26 @@ router.post('/verify-payment', async (req, res) => {
                 return res.status(400).json({ error: 'User ID not found in session metadata' });
             }
 
+            // Fetch system settings for membership duration
+            const { data: settings } = await supabase
+                .from('settings')
+                .select('*')
+                .single();
+
+            const membershipDurationDays = settings?.membershipDurationDays || 365;
+
+            // Calculate expiry date
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + membershipDurationDays);
+
             // Update user permissions in DB
             const { data: updatedUser, error: updateError } = await supabase
                 .from('users')
-                .update({ canViewHelpers: 1, canViewJobs: 1 })
+                .update({
+                    canViewHelpers: 1,
+                    canViewJobs: 1,
+                    membershipExpiry: expiryDate.toISOString()
+                })
                 .eq('id', userId)
                 .select()
                 .single();
