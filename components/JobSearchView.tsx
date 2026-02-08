@@ -66,12 +66,39 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
                     To ensure recruitment quality, helpers must have at least one **"approved"** profile to view job postings.<br />
                     If you haven't filled it out, please go to your profile. If you have, please wait for admin approval.
                   </div>
+
+                  <div className="bg-green-50 text-green-800 p-6 rounded-2xl font-medium border border-green-100 mt-4">
+                    <p className="mb-4">Or upgrade to Premium to view all jobs instantly!</p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/payments/create-checkout-session', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: user.id, planId: 'premium_helper' })
+                          });
+                          const data = await res.json();
+                          if (data.url) {
+                            window.location.href = data.url;
+                          } else {
+                            alert('Payment initialization failed: ' + (data.error || 'Unknown error'));
+                          }
+                        } catch (err) {
+                          console.error(err);
+                          alert('Error initiating payment');
+                        }
+                      }}
+                      className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition"
+                    >
+                      Upgrade for HK$388
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>
           )}
         </div>
-      </div>
+      </div >
     );
   }
 
