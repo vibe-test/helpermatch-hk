@@ -40,4 +40,4 @@ export interface JobPost {
   description: string;
 }
 
-export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN';
+export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN' | 'PAYMENT_SUCCESS';

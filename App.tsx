@@ -37,6 +37,32 @@ const App: React.FC = () => {
     fetchJobs();
   }, [user]);
 
+  // Handle Payment Verification
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const sessionId = query.get('session_id');
+
+    if (sessionId) {
+      fetch('/api/payments/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.user) {
+            setUser(data.user);
+            setCurrentView('PAYMENT_SUCCESS');
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            console.error('Payment verification failed:', data.error);
+          }
+        })
+        .catch(err => console.error('Error verifying payment:', err));
+    }
+  }, []);
+
   const handlePostJob = async (newJob: Omit<JobPost, 'id' | 'postedAt'>) => {
     try {
       const response = await fetch('/api/jobs', {
@@ -73,6 +99,26 @@ const App: React.FC = () => {
         return <SmartMatchView />;
       case 'ADMIN':
         return <AdminDashboard />;
+      case 'PAYMENT_SUCCESS':
+        return (
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md mx-6">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl">🎉</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Payment Successful!</h2>
+              <p className="text-gray-600 mb-8">
+                Your account has been upgraded. You now have full access to view all helper profiles.
+              </p>
+              <button
+                onClick={() => setCurrentView('SEARCH_HELPERS')}
+                className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition w-full"
+              >
+                Browse Helpers
+              </button>
+            </div>
+          </div>
+        );
       default:
         return <HomeView onNavigate={setCurrentView} />;
     }
