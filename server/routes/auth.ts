@@ -66,7 +66,9 @@ router.post('/register', async (req, res) => {
                 email,
                 password,
                 role,
-                status: 'approved' // Setting to approved for easier testing, or 'pending' if you want admin approval
+                status: 'approved',
+                canViewHelpers: 0,
+                canViewJobs: 0
             }]);
 
         if (insertError) throw insertError;

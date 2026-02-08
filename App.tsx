@@ -77,11 +77,13 @@ const App: React.FC = () => {
         alert('Job post submitted! It will be visible after admin approval.');
         setCurrentView('HOME');
       } else {
-        console.error('Failed to post job');
-        // Handle error (e.g., show notification)
+        const errorData = await response.json();
+        console.error('Failed to post job:', errorData);
+        alert(`Failed to post job: ${errorData.error || 'Unknown error'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error posting job:', error);
+      alert(`Error: ${error.message}`);
     }
   };
 
