@@ -19,6 +19,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const roleRef = React.useRef(role);
+
+    // Keep ref updated for Google callback
+    useEffect(() => {
+        roleRef.current = role;
+    }, [role]);
 
     // Initialize Google Login
     useEffect(() => {
@@ -27,13 +33,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
                 const google = (window as any).google;
                 if (google && google.accounts && google.accounts.id) {
                     google.accounts.id.initialize({
-                        client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com", // Replace with actual Client ID
+                        // IMPORTANT: User must replace this with their actual Google Client ID
+                        client_id: "776945037563-vhv8j6k4j3j7j6k4j3j7j6k4j3j7.apps.googleusercontent.com",
                         callback: handleGoogleResponse
                     });
-                    google.accounts.id.renderButton(
-                        document.getElementById("googleSignInDiv"),
-                        { theme: "outline", size: "large", width: "100%" }
-                    );
+
+                    const btnContainer = document.getElementById("googleSignInDiv");
+                    if (btnContainer) {
+                        google.accounts.id.renderButton(
+                            btnContainer,
+                            { theme: "outline", size: "large", width: "100%", text: authState === 'register' ? "signup_with" : "signin_with" }
+                        );
+                    }
                 }
             }, 500);
             return () => clearTimeout(timer);
@@ -49,7 +60,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     credential: response.credential,
-                    role: role // Use the currently selected role
+                    role: roleRef.current // Use the LATEST role from ref
                 })
             });
             const data = await res.json();
@@ -110,8 +121,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
                     onLoginSuccess(data.user);
                     onClose();
                 } else if (authState === 'register') {
-                    setAuthState('login');
-                    setMessage('Registration successful! Please login.');
+                    // Automatically log in after registration
+                    const loginRes = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    });
+                    const loginData = await loginRes.json();
+                    if (loginRes.ok) {
+                        onLoginSuccess(loginData.user);
+                        onClose();
+                    } else {
+                        setAuthState('login');
+                        setMessage('Registration successful! Please login with your password.');
+                    }
                 } else if (authState === 'forgot-password') {
                     setMessage(data.message || 'Reset link sent to your email.');
                     // For dev purposes, if we get a token back, we could automatically switch to reset view
@@ -165,6 +188,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
                         <div className="p-3 rounded-lg text-sm font-medium bg-green-50 text-green-600">
                             {message}
                         </div>
+                    )}
+
+                    {(authState === 'login' || authState === 'register') && (
+                        <>
+                            <div id="googleSignInDiv" className="flex justify-center mb-2"></div>
+                            <div className="relative flex items-center gap-2 py-2">
+                                <div className="flex-grow border-t border-gray-200"></div>
+                                <span className="text-xs text-gray-400 font-medium">OR</span>
+                                <div className="flex-grow border-t border-gray-200"></div>
+                            </div>
+                        </>
                     )}
 
                     {authState === 'register' && (
@@ -280,48 +314,36 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }
                         )}
                     </button>
 
-                    {(authState === 'login' || authState === 'register') && (
-                        <>
-                            <div className="relative flex items-center gap-2 py-2">
-                                <div className="flex-grow border-t border-gray-200"></div>
-                                <span className="text-xs text-gray-400 font-medium">OR</span>
-                                <div className="flex-grow border-t border-gray-200"></div>
-                            </div>
-
-                            <div id="googleSignInDiv"></div>
-
-                            <div className="text-center">
-                                <button
-                                    type="button"
-                                    onClick={() => setAuthState(authState === 'login' ? 'register' : 'login')}
-                                    className="text-sm text-blue-600 font-medium hover:underline"
-                                >
-                                    {authState === 'login' ? "Don't have an account? Register now" : 'Already have an account? Login now'}
-                                </button>
-                            </div>
-                        </>
-                    )}
-
-                    {(authState === 'forgot-password' || authState === 'reset-password') && (
-                        <div className="text-center">
+                    <div className="text-center">
+                        {(authState === 'login' || authState === 'register') ? (
                             <button
                                 type="button"
-                                onClick={() => setAuthState('login')}
+                                onClick={() => setAuthState(authState === 'login' ? 'register' : 'login')}
                                 className="text-sm text-blue-600 font-medium hover:underline"
                             >
-                                Back to Login
+                                {authState === 'login' ? "Don't have an account? Register now" : 'Already have an account? Login now'}
                             </button>
-                            {authState === 'forgot-password' && (
+                        ) : (
+                            <div className="space-y-2">
                                 <button
                                     type="button"
-                                    onClick={() => setAuthState('reset-password')}
-                                    className="block mx-auto mt-2 text-xs text-gray-500 hover:underline"
+                                    onClick={() => setAuthState('login')}
+                                    className="text-sm text-blue-600 font-medium hover:underline"
                                 >
-                                    Already have a token?
+                                    Back to Login
                                 </button>
-                            )}
-                        </div>
-                    )}
+                                {authState === 'forgot-password' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setAuthState('reset-password')}
+                                        className="block mx-auto text-xs text-gray-500 hover:underline"
+                                    >
+                                        Already have a token?
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </form>
             </div>
         </div>
