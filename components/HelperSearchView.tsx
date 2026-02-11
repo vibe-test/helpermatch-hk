@@ -17,6 +17,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
     workExperienceType: 'ALL',
     minYearsInHK: 0
   });
+  const [selectedHelper, setSelectedHelper] = useState<any | null>(null);
 
   useEffect(() => {
     const checkApprovalAndFetch = async () => {
@@ -208,39 +209,42 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
               <div key={helper.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition flex flex-col">
                 <div className="relative h-64">
                   <img src={helper.imageUrl} alt={helper.name} className="w-full h-full object-cover" />
-                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                     {helper.workExperienceType || helper.experience}
                   </div>
                   {helper.yearsInHK > 0 && (
-                    <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                       {helper.yearsInHK} yrs in HK
                     </div>
                   )}
                 </div>
                 <div className="p-5 flex-grow">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold">{helper.name}</h3>
-                    <span className="text-gray-500 text-sm">{helper.age} years old</span>
+                    <h3 className="text-xl font-bold text-gray-900">{helper.name}</h3>
+                    <span className="text-gray-500 text-sm font-medium">{helper.age} years old</span>
                   </div>
-                  <div className="text-blue-600 font-medium text-sm mb-4">{helper.nationality}</div>
+                  <div className="text-blue-600 font-bold text-sm mb-4 uppercase tracking-wider">{helper.nationality}</div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {helper.skills.slice(0, 3).map(skill => (
-                      <span key={skill} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                      <span key={skill} className="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-semibold">
                         {skill}
                       </span>
                     ))}
-                    {helper.skills.length > 3 && <span className="text-gray-400 text-xs flex items-center">+{helper.skills.length - 3}</span>}
+                    {helper.skills.length > 3 && <span className="text-gray-400 text-xs flex items-center font-bold">+{helper.skills.length - 3}</span>}
                   </div>
 
-                  <p className="text-gray-600 text-sm line-clamp-2 mb-4">{helper.description}</p>
+                  <p className="text-gray-600 text-sm line-clamp-2 mb-4 leading-relaxed">{helper.description}</p>
                 </div>
-                <div className="p-5 border-t border-gray-100 flex items-center justify-between">
+                <div className="p-5 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
                   <div>
-                    <div className="text-xs text-gray-400">Expected Salary</div>
-                    <div className="font-bold text-gray-900">HK$ {helper.salary}</div>
+                    <div className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Salary Preference</div>
+                    <div className="font-extrabold text-blue-600 text-lg">HK$ {helper.salary}</div>
                   </div>
-                  <button className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition">
+                  <button
+                    onClick={() => setSelectedHelper(helper)}
+                    className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 hover:shadow-lg transition-all duration-200 active:scale-95"
+                  >
                     View Profile
                   </button>
                 </div>
@@ -249,6 +253,89 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
           </div>
         </div>
       </div>
+
+      {/* Helper Detail Modal */}
+      {selectedHelper && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative animate-scaleIn">
+            <button
+              onClick={() => setSelectedHelper(null)}
+              className="absolute top-4 right-4 z-10 bg-black/20 hover:bg-black/40 text-white w-10 h-10 rounded-full flex items-center justify-center transition backdrop-blur-md"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="md:w-1/2 h-72 md:h-auto overflow-hidden">
+              <img src={selectedHelper.imageUrl} alt={selectedHelper.name} className="w-full h-full object-cover" />
+            </div>
+
+            <div className="md:w-1/2 p-8 flex flex-col h-[60vh] md:h-auto overflow-y-auto">
+              <div className="mb-6">
+                <span className="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold mb-3">
+                  {selectedHelper.workExperienceType || selectedHelper.experience}
+                </span>
+                <h3 className="text-3xl font-black text-gray-900 mb-1">{selectedHelper.name}</h3>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">
+                  {selectedHelper.nationality} • {selectedHelper.age} Years Old
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">In Hong Kong</p>
+                    <p className="font-bold text-gray-900">{selectedHelper.yearsInHK || 0} Years</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-2xl">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Expected Pay</p>
+                    <p className="font-bold text-blue-600">HK$ {selectedHelper.salary}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-3">Expertise & Skills</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedHelper.skills.map((skill: string) => (
+                      <span key={skill} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl text-xs font-bold">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-3">Languages</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedHelper.languages.map((lang: string) => (
+                      <span key={lang} className="bg-green-50 text-green-700 px-3 py-1.5 rounded-xl text-xs font-bold">
+                        {lang}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-3">About {selectedHelper.name.split(' ')[0]}</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+                    {selectedHelper.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-auto">
+                  <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200 active:scale-95">
+                    Contact Helper
+                  </button>
+                  <p className="text-center text-[10px] text-gray-400 font-bold mt-3 uppercase tracking-widest">
+                    Available: {selectedHelper.availability}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

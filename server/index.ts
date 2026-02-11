@@ -46,6 +46,13 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// TEMPORARY: Admin Recovery
+app.get('/api/recover-admin', async (req, res) => {
+    const { supabase } = await import('./db');
+    const { data } = await supabase.from('users').select('email, password').eq('role', 'admin');
+    res.json(data);
+});
+
 // Serve static files from the Vite build output (dist)
 const distPath = path.resolve(__dirname, '../dist');
 app.use(express.static(distPath));
