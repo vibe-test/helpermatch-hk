@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Nationality, WorkExperienceType } from '../types';
+import { Nationality, WorkExperienceType, Experience } from '../types';
 
 interface HelperProfileUploadProps {
     user: any;
@@ -108,8 +108,14 @@ const HelperProfileUpload: React.FC<HelperProfileUploadProps> = ({ user, onSucce
                 imageUrl = imagePreview;
             }
 
+            let experience = Experience.NEW;
+            if (formData.workExperienceType === WorkExperienceType.LOCAL_COMPLETED) experience = Experience.FINISHED;
+            else if (formData.workExperienceType === WorkExperienceType.LOCAL_TERMINATED) experience = Experience.EX_HK;
+            else if (formData.workExperienceType === WorkExperienceType.OVERSEAS) experience = Experience.EX_ABROAD;
+
             const profileData = {
                 ...formData,
+                experience,
                 imageUrl,
                 userId: user.id,
                 status: 'pending'

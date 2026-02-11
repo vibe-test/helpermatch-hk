@@ -9,7 +9,7 @@ const HelperSchema = z.object({
     name: z.string(),
     age: z.number(),
     nationality: z.string(),
-    experience: z.string(),
+    experience: z.string().optional().nullable(),
     yearsInHK: z.number().optional().nullable(),
     workExperienceType: z.string().optional().nullable(),
     salary: z.number(),
