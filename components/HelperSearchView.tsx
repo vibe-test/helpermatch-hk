@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Nationality, Experience, HelperProfile } from '../types';
+import { Nationality, Experience, HelperProfile, WorkExperienceType } from '../types';
 
 interface HelperSearchViewProps {
   user: any;
@@ -13,7 +13,9 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
   const [price, setPrice] = useState(388); // Default price in HKD
   const [filters, setFilters] = useState({
     nationality: 'ALL',
-    experience: 'ALL'
+    experience: 'ALL',
+    workExperienceType: 'ALL',
+    minYearsInHK: 0
   });
 
   useEffect(() => {
@@ -126,8 +128,12 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
   }
 
   const filteredHelpers = helpers.filter(helper => {
-    return (filters.nationality === 'ALL' || helper.nationality === filters.nationality) &&
-      (filters.experience === 'ALL' || helper.experience === filters.experience);
+    const nationalityMatch = filters.nationality === 'ALL' || helper.nationality === filters.nationality;
+    const experienceMatch = filters.experience === 'ALL' || helper.experience === filters.experience;
+    const workExpMatch = filters.workExperienceType === 'ALL' || helper.workExperienceType === filters.workExperienceType;
+    const yearsMatch = !filters.minYearsInHK || (helper.yearsInHK || 0) >= filters.minYearsInHK;
+
+    return nationalityMatch && experienceMatch && workExpMatch && yearsMatch;
   });
 
   return (
@@ -160,6 +166,28 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                   {Object.values(Experience).map(exp => <option key={exp} value={exp}>{exp}</option>)}
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Work Experience Type</label>
+                <select
+                  className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border"
+                  value={filters.workExperienceType}
+                  onChange={(e) => setFilters({ ...filters, workExperienceType: e.target.value })}
+                >
+                  <option value="ALL">All</option>
+                  {Object.values(WorkExperienceType).map(type => <option key={type} value={type}>{type}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Min. Years in HK</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="20"
+                  className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 border"
+                  value={filters.minYearsInHK}
+                  onChange={(e) => setFilters({ ...filters, minYearsInHK: parseInt(e.target.value) || 0 })}
+                />
+              </div>
             </div>
           </div>
           <div className="p-4 bg-blue-50 rounded-xl">
@@ -181,8 +209,13 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 <div className="relative h-64">
                   <img src={helper.imageUrl} alt={helper.name} className="w-full h-full object-cover" />
                   <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                    {helper.experience}
+                    {helper.workExperienceType || helper.experience}
                   </div>
+                  {helper.yearsInHK > 0 && (
+                    <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      {helper.yearsInHK} yrs in HK
+                    </div>
+                  )}
                 </div>
                 <div className="p-5 flex-grow">
                   <div className="flex justify-between items-start mb-2">

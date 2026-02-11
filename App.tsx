@@ -10,6 +10,7 @@ import JobSearchView from './components/JobSearchView';
 import PostJobView from './components/PostJobView';
 import SmartMatchView from './components/SmartMatchView';
 import AdminDashboard from './components/AdminDashboard';
+import HelperProfileUpload from './components/HelperProfileUpload';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('HOME');
@@ -101,6 +102,8 @@ const App: React.FC = () => {
         return <SmartMatchView />;
       case 'ADMIN':
         return <AdminDashboard />;
+      case 'HELPER_PROFILE':
+        return <HelperProfileUpload user={user} onSuccess={() => setCurrentView('SEARCH_HELPERS')} />;
       case 'PAYMENT_SUCCESS':
         return (
           <div className="flex items-center justify-center min-h-[50vh]">

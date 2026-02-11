@@ -64,6 +64,14 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
               >
                 <span className="animate-pulse">✨</span> AI Match
               </button>
+              {user?.role === 'helper' && (
+                <button
+                  onClick={() => onNavigate('HELPER_PROFILE')}
+                  className={`${currentView === 'HELPER_PROFILE' ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-500 font-medium`}
+                >
+                  My Profile
+                </button>
+              )}
               {user?.role === 'admin' && (
                 <button
                   onClick={() => onNavigate('ADMIN')}
@@ -124,6 +132,9 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
             <button onClick={() => { onNavigate('SEARCH_HELPERS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Helpers</button>
             <button onClick={() => { onNavigate('SEARCH_JOBS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Jobs</button>
             <button onClick={() => { onNavigate('AI_MATCH'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-pink-600">AI Match</button>
+            {user?.role === 'helper' && (
+              <button onClick={() => { onNavigate('HELPER_PROFILE'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-blue-600">My Profile</button>
+            )}
             <button onClick={() => { onNavigate('POST_JOB'); setIsMenuOpen(false); }} className="block w-full bg-blue-600 text-white p-2 rounded-md text-center">Post Job</button>
             {user && (
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">

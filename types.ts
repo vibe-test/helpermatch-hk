@@ -14,18 +14,29 @@ export enum Experience {
   EX_ABROAD = 'Overseas Experience'
 }
 
+export enum WorkExperienceType {
+  LOCAL_COMPLETED = 'Local - Completed Contract',
+  LOCAL_TERMINATED = 'Local - Terminated Contract',
+  OVERSEAS = 'Overseas Experience',
+  NEW = 'New to Hong Kong'
+}
+
 export interface HelperProfile {
   id: string;
+  userId?: string;
   name: string;
   age: number;
   nationality: Nationality;
   experience: Experience;
+  yearsInHK?: number;
+  workExperienceType?: WorkExperienceType;
   salary: number;
   skills: string[];
   languages: string[];
   imageUrl: string;
   availability: string;
   description: string;
+  status?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface JobPost {
@@ -40,4 +51,4 @@ export interface JobPost {
   description: string;
 }
 
-export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN' | 'PAYMENT_SUCCESS';
+export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN' | 'PAYMENT_SUCCESS' | 'HELPER_PROFILE';
