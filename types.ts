@@ -41,6 +41,7 @@ export interface HelperProfile {
 
 export interface JobPost {
   id: string;
+  userId?: string;
   title: string;
   location: string;
   salary: string;
@@ -51,4 +52,4 @@ export interface JobPost {
   description: string;
 }
 
-export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN' | 'PAYMENT_SUCCESS' | 'HELPER_PROFILE';
+export type ViewState = 'HOME' | 'SEARCH_HELPERS' | 'SEARCH_JOBS' | 'POST_JOB' | 'AI_MATCH' | 'ADMIN' | 'PAYMENT_SUCCESS' | 'HELPER_PROFILE' | 'MESSAGES';

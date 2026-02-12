@@ -10,6 +10,7 @@ import userRoutes from './routes/users';
 import paymentRoutes from './routes/payments';
 import settingsRoutes from './routes/settings';
 import oauthRoutes from './routes/oauth';
+import messageRoutes from './routes/messages';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/oauth', oauthRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

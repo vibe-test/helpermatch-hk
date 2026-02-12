@@ -4,9 +4,10 @@ import { Nationality, Experience, HelperProfile, WorkExperienceType } from '../t
 
 interface HelperSearchViewProps {
   user: any;
+  onStartChat?: (userId: string) => void;
 }
 
-const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
+const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user, onStartChat }) => {
   const [helpers, setHelpers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isApprovedByContent, setIsApprovedByContent] = useState(false);
@@ -18,6 +19,7 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
     minYearsInHK: 0
   });
   const [selectedHelper, setSelectedHelper] = useState<any | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     const checkApprovalAndFetch = async () => {
@@ -25,14 +27,24 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
       try {
         // 1. Check if user has permission
         if (user) {
-          if (user.role === 'admin') {
-            setIsApprovedByContent(true);
-          } else if (user.role === 'helper') {
-            setIsApprovedByContent(true); // 姐姐隨時可以睇姐姐資料 (自己類別)
-          } else if (user.role === 'employer') {
-            // 使用管理員設定的個人權限開關
-            const canView = user.canViewHelpers === 1 || user.canViewHelpers === true;
-            setIsApprovedByContent(canView);
+          const userRes = await fetch(`/api/users/${user.id}`);
+          if (userRes.ok) {
+            const latestUser = await userRes.json();
+
+            if (latestUser.role === 'admin' || latestUser.role === 'helper') {
+              setIsApprovedByContent(true);
+            } else if (latestUser.role === 'employer') {
+              // Check for payment/admin switch
+              const hasPermission = latestUser.canViewHelpers === 1 || latestUser.canViewHelpers === true;
+
+              // Also check for approved job posts
+              const jobsRes = await fetch(`/api/jobs?userId=${user.id}&admin=true`);
+              const jobs = await jobsRes.json();
+              const hasApprovedJob = Array.isArray(jobs) && jobs.some((j: any) => j.status === 'approved');
+
+              setDebugInfo({ latestUser, hasPermission, hasApprovedJob });
+              setIsApprovedByContent(hasPermission || hasApprovedJob);
+            }
           }
         } else {
           setIsApprovedByContent(false);
@@ -84,6 +96,13 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 <p><strong>Current Account Info:</strong></p>
                 <p>Email: {user.email}</p>
                 <p>Role: {user.role === 'employer' ? 'Employer' : user.role === 'helper' ? 'Helper' : user.role}</p>
+                {debugInfo && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p>Status: {debugInfo.latestUser?.status}</p>
+                    <p>Helper Permission: {debugInfo.hasPermission ? 'Yes' : 'No'}</p>
+                    <p>Approved Job: {debugInfo.hasApprovedJob ? 'Yes' : 'No'}</p>
+                  </div>
+                )}
               </div>
 
               {user.role === 'employer' ? (
@@ -324,7 +343,17 @@ const HelperSearchView: React.FC<HelperSearchViewProps> = ({ user }) => {
                 </div>
 
                 <div className="pt-4 mt-auto">
-                  <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200 active:scale-95">
+                  <button
+                    onClick={() => {
+                      if (selectedHelper.userId && onStartChat) {
+                        onStartChat(selectedHelper.userId);
+                        setSelectedHelper(null);
+                      } else {
+                        alert('This helper has not linked a user account or messaging is unavailable.');
+                      }
+                    }}
+                    className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-blue-700 transition shadow-xl shadow-blue-200 active:scale-95"
+                  >
                     Contact Helper
                   </button>
                   <p className="text-center text-[10px] text-gray-400 font-bold mt-3 uppercase tracking-widest">

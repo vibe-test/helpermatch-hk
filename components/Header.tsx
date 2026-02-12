@@ -64,6 +64,17 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
               >
                 <span className="animate-pulse">✨</span> AI Match
               </button>
+              {user && (
+                <button
+                  onClick={() => onNavigate('MESSAGES')}
+                  className={`${currentView === 'MESSAGES' ? 'text-blue-600' : 'text-gray-600'} hover:text-blue-500 font-medium flex items-center gap-1`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                  <span className="hidden lg:inline">Messages</span>
+                </button>
+              )}
               {user?.role === 'helper' && (
                 <button
                   onClick={() => onNavigate('HELPER_PROFILE')}
@@ -132,6 +143,9 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
             <button onClick={() => { onNavigate('SEARCH_HELPERS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Helpers</button>
             <button onClick={() => { onNavigate('SEARCH_JOBS'); setIsMenuOpen(false); }} className="block w-full text-left font-medium">Find Jobs</button>
             <button onClick={() => { onNavigate('AI_MATCH'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-pink-600">AI Match</button>
+            {user && (
+              <button onClick={() => { onNavigate('MESSAGES'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-blue-600">Messages</button>
+            )}
             {user?.role === 'helper' && (
               <button onClick={() => { onNavigate('HELPER_PROFILE'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-blue-600">My Profile</button>
             )}

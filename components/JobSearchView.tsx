@@ -4,30 +4,45 @@ import { JobPost } from '../types';
 interface JobSearchViewProps {
   jobs: JobPost[];
   user: any;
+  onStartChat?: (userId: string) => void;
 }
 
-const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
+const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user, onStartChat }) => {
   const [loading, setLoading] = useState(true);
   const [isApprovedByContent, setIsApprovedByContent] = useState(false);
   const [price, setPrice] = useState(388); // Default price in HKD
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     const checkApproval = async () => {
       setLoading(true);
       try {
         if (user) {
-          if (user.role === 'admin') {
-            setIsApprovedByContent(true);
-          } else if (user.role === 'employer') {
-            setIsApprovedByContent(true); // Employers can always view job postings (their own category)
-          } else if (user.role === 'helper') {
-            // Use the individual permission switch set by the admin
-            const canView = user.canViewJobs === 1 || user.canViewJobs === true;
-            setIsApprovedByContent(canView);
+          // Re-fetch user status to get latest permissions
+          const userRes = await fetch(`/api/users/${user.id}`);
+          if (userRes.ok) {
+            const latestUser = await userRes.json();
+            setDebugInfo(prev => ({ ...prev, latestUser }));
+
+            if (latestUser.role === 'admin' || latestUser.role === 'employer') {
+              setIsApprovedByContent(true);
+            } else if (latestUser.role === 'helper') {
+              // Helper can view if admin toggled the switch OR if they have an approved profile
+              const hasPermission = latestUser.canViewJobs === 1 || latestUser.canViewJobs === true;
+
+              // Also check if they have an approved profile
+              const profileRes = await fetch(`/api/helpers?userId=${user.id}`);
+              const profiles = await profileRes.json();
+              setDebugInfo(prev => ({ ...prev, profiles, hasPermission }));
+
+              const hasApprovedProfile = Array.isArray(profiles) && profiles.some((p: any) => p.status === 'approved');
+
+              setIsApprovedByContent(hasPermission || hasApprovedProfile);
+            }
           }
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error checking approval:', error);
       } finally {
         setLoading(false);
       }
@@ -70,6 +85,13 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
                 <p><strong>Current Account Info:</strong></p>
                 <p>Email: {user.email}</p>
                 <p>Role: {user.role === 'employer' ? 'Employer' : user.role === 'helper' ? 'Helper' : user.role}</p>
+                {debugInfo && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p>Status: {debugInfo.latestUser?.status}</p>
+                    <p>Job Permission: {debugInfo.hasPermission ? 'Yes' : 'No'}</p>
+                    <p>Approved Profile: {debugInfo.profiles?.some((p: any) => p.status === 'approved') ? 'Yes' : 'No'}</p>
+                  </div>
+                )}
               </div>
 
               {user.role === 'helper' ? (
@@ -168,8 +190,18 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user }) => {
                 </div>
               </div>
               <div className="flex flex-col gap-2 min-w-[140px]">
-                <button className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
-                  Apply Now
+                <button
+                  onClick={() => {
+                    const jobUserId = (job as any).userId;
+                    if (jobUserId && onStartChat) {
+                      onStartChat(jobUserId);
+                    } else {
+                      alert('This employer has not linked a user account or messaging is unavailable.');
+                    }
+                  }}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                >
+                  Contact Employer
                 </button>
                 <button className="text-blue-600 text-sm font-medium hover:underline">
                   Save Job

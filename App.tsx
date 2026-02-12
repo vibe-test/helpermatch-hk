@@ -11,11 +11,13 @@ import PostJobView from './components/PostJobView';
 import SmartMatchView from './components/SmartMatchView';
 import AdminDashboard from './components/AdminDashboard';
 import HelperProfileUpload from './components/HelperProfileUpload';
+import ChatView from './components/ChatView';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('HOME');
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [targetChatUserId, setTargetChatUserId] = useState<string | null>(null);
 
   // Initialize jobs from backend
   useEffect(() => {
@@ -124,16 +126,29 @@ const App: React.FC = () => {
             </div>
           </div>
         );
+      case 'MESSAGES':
+        return <ChatView user={user} targetUserId={targetChatUserId} />;
       default:
         return <HomeView onNavigate={setCurrentView} />;
     }
+  };
+
+  const handleStartChat = (targetUserId: string) => {
+    if (!user) {
+      alert('Please login first to send messages');
+      return;
+    }
+    setTargetChatUserId(targetUserId);
+    setCurrentView('MESSAGES');
   };
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header currentView={currentView} onNavigate={setCurrentView} user={user} setUser={setUser} />
       <main className="flex-grow">
-        {renderView()}
+        {currentView === 'SEARCH_HELPERS' ? <HelperSearchView user={user} onStartChat={handleStartChat} /> :
+          currentView === 'SEARCH_JOBS' ? <JobSearchView jobs={jobs} user={user} onStartChat={handleStartChat} /> :
+            renderView()}
       </main>
       <Footer onNavigate={setCurrentView} />
     </div>
