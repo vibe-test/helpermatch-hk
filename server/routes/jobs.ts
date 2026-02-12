@@ -23,14 +23,28 @@ router.get('/', async (req, res) => {
 
     // Privacy Control: Check if specific helper can see jobs
     if (!isAdmin && userRole === 'helper' && viewerId) {
+        // 1. Check user table for manual permission
         const { data: user } = await supabase
             .from('users')
             .select('canViewJobs')
             .eq('id', viewerId)
             .single();
 
-        if (user && user.canViewJobs === false) {
-            return res.json([]);
+        const hasManualPermission = user && (user.canViewJobs === true || user.canViewJobs === 1);
+
+        if (!hasManualPermission) {
+            // 2. Check helper_profiles for approved profile
+            const { data: profiles } = await supabase
+                .from('helpers')
+                .select('id')
+                .eq('userId', viewerId)
+                .eq('status', 'approved');
+
+            const hasApprovedProfile = profiles && profiles.length > 0;
+
+            if (!hasApprovedProfile) {
+                return res.json([]);
+            }
         }
     }
 

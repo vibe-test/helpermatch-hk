@@ -29,14 +29,28 @@ router.get('/', async (req, res) => {
 
     // Privacy Control: Check if specific employer can see helpers
     if (!isAdmin && userRole === 'employer' && viewerId) {
+        // 1. Check user table for manual permission
         const { data: user } = await supabase
             .from('users')
             .select('canViewHelpers')
             .eq('id', viewerId)
             .single();
 
-        if (user && user.canViewHelpers === false) {
-            return res.json([]);
+        const hasManualPermission = user && (user.canViewHelpers === true || user.canViewHelpers === 1);
+
+        if (!hasManualPermission) {
+            // 2. Check jobs table for approved job
+            const { data: jobs } = await supabase
+                .from('jobs')
+                .select('id')
+                .eq('userId', viewerId)
+                .eq('status', 'approved');
+
+            const hasApprovedJob = jobs && jobs.length > 0;
+
+            if (!hasApprovedJob) {
+                return res.json([]);
+            }
         }
     }
 
