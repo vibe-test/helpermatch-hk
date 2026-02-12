@@ -93,7 +93,7 @@ const App: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case 'HOME':
-        return <HomeView onNavigate={setCurrentView} />;
+        return <HomeView onNavigate={setCurrentView} user={user} />;
       case 'SEARCH_HELPERS':
         return <HelperSearchView user={user} />;
       case 'SEARCH_JOBS':

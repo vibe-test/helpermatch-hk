@@ -4,9 +4,10 @@ import { ViewState } from '../types';
 
 interface HomeViewProps {
   onNavigate: (view: ViewState) => void;
+  user: any;
 }
 
-const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
+const HomeView: React.FC<HomeViewProps> = ({ onNavigate, user }) => {
   return (
     <div className="animate-fadeIn">
       {/* Hero Section */}
@@ -119,12 +120,21 @@ const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Ready to find your perfect helper?</h2>
           <div className="flex justify-center gap-4">
-            <button
-              onClick={() => onNavigate('POST_JOB')}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-bold text-lg transition shadow-xl"
-            >
-              Post a Job Now
-            </button>
+            {(!user || user.role === 'employer' || user.role === 'admin') ? (
+              <button
+                onClick={() => onNavigate('POST_JOB')}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-bold text-lg transition shadow-xl"
+              >
+                Post a Job Now
+              </button>
+            ) : (
+              <button
+                onClick={() => onNavigate('SEARCH_JOBS')}
+                className="bg-pink-600 hover:bg-pink-500 text-white px-10 py-4 rounded-full font-bold text-lg transition shadow-xl"
+              >
+                Browse Latest Jobs
+              </button>
+            )}
           </div>
         </div>
       </section>

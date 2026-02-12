@@ -94,12 +94,14 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
             </nav>
 
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => onNavigate('POST_JOB')}
-                className="hidden sm:block bg-blue-600 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-700 transition"
-              >
-                Post Job
-              </button>
+              {(user?.role === 'employer' || user?.role === 'admin') && (
+                <button
+                  onClick={() => onNavigate('POST_JOB')}
+                  className="hidden sm:block bg-blue-600 text-white px-5 py-2 rounded-full font-medium hover:bg-blue-700 transition"
+                >
+                  Post Job
+                </button>
+              )}
 
               {user ? (
                 <div className="flex items-center gap-3">
@@ -149,7 +151,9 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
             {user?.role === 'helper' && (
               <button onClick={() => { onNavigate('HELPER_PROFILE'); setIsMenuOpen(false); }} className="block w-full text-left font-medium text-blue-600">My Profile</button>
             )}
-            <button onClick={() => { onNavigate('POST_JOB'); setIsMenuOpen(false); }} className="block w-full bg-blue-600 text-white p-2 rounded-md text-center">Post Job</button>
+            {(user?.role === 'employer' || user?.role === 'admin') && (
+              <button onClick={() => { onNavigate('POST_JOB'); setIsMenuOpen(false); }} className="block w-full bg-blue-600 text-white p-2 rounded-md text-center">Post Job</button>
+            )}
             {user && (
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                 <span className="font-bold text-gray-900">{user.name}</span>
