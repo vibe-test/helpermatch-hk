@@ -18,31 +18,36 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user, onStartChat }
       setLoading(true);
       try {
         if (user) {
-          // Re-fetch user status to get latest permissions
           const userRes = await fetch(`/api/users/${user.id}`);
           if (userRes.ok) {
             const latestUser = await userRes.json();
-            setDebugInfo(prev => ({ ...prev, latestUser }));
 
             if (latestUser.role === 'admin' || latestUser.role === 'employer') {
               setIsApprovedByContent(true);
+              setDebugInfo({ status: 'Authorized', latestUser });
             } else if (latestUser.role === 'helper') {
-              // Helper can view if admin toggled the switch OR if they have an approved profile
               const hasPermission = latestUser.canViewJobs === 1 || latestUser.canViewJobs === true;
-
-              // Also check if they have an approved profile
-              const profileRes = await fetch(`/api/helpers?userId=${user.id}`);
+              const profileRes = await fetch(`/api/helpers?userId=${latestUser.id}&admin=true`);
               const profiles = await profileRes.json();
-              setDebugInfo(prev => ({ ...prev, profiles, hasPermission }));
 
-              const hasApprovedProfile = Array.isArray(profiles) && profiles.some((p: any) => p.status === 'approved');
+              const approvedProfile = Array.isArray(profiles) && profiles.find((p: any) => p.status === 'approved');
+              const hasApprovedProfile = !!approvedProfile;
+
+              setDebugInfo({
+                latestUser,
+                hasPermission,
+                hasApprovedProfile,
+                profileCount: Array.isArray(profiles) ? profiles.length : 0,
+                firstProfileStatus: Array.isArray(profiles) && profiles.length > 0 ? profiles[0].status : 'none'
+              });
 
               setIsApprovedByContent(hasPermission || hasApprovedProfile);
             }
           }
         }
-      } catch (error) {
-        console.error('Error checking approval:', error);
+      } catch (error: any) {
+        console.error('Error:', error);
+        setDebugInfo({ error: error.message });
       } finally {
         setLoading(false);
       }
@@ -52,9 +57,9 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user, onStartChat }
       try {
         const res = await fetch('/api/settings');
         const settings = await res.json();
-        setPrice((settings.helperPrice || 38800) / 100); // Convert cents to HKD
+        setPrice((settings.helperPrice || 38800) / 100);
       } catch (err) {
-        console.error('Error fetching settings:', err);
+        console.error(err);
       }
     };
 
@@ -89,7 +94,9 @@ const JobSearchView: React.FC<JobSearchViewProps> = ({ jobs, user, onStartChat }
                   <div className="mt-2 pt-2 border-t border-gray-200">
                     <p>Status: {debugInfo.latestUser?.status}</p>
                     <p>Job Permission: {debugInfo.hasPermission ? 'Yes' : 'No'}</p>
-                    <p>Approved Profile: {debugInfo.profiles?.some((p: any) => p.status === 'approved') ? 'Yes' : 'No'}</p>
+                    <p>Approved Profile: {debugInfo.hasApprovedProfile ? 'Yes' : 'No'}</p>
+                    <p>Profiles Found: {debugInfo.profileCount}</p>
+                    {debugInfo.profileCount > 0 && <p>First Profile Status: {debugInfo.firstProfileStatus}</p>}
                   </div>
                 )}
               </div>
