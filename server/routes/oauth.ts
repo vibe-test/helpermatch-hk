@@ -1,5 +1,6 @@
 import express from 'express';
 import { supabase } from '../db';
+import { sendResetPasswordEmail } from '../utils/email';
 
 const router = express.Router();
 
@@ -116,14 +117,13 @@ router.post('/forgot-password', async (req, res) => {
 
         if (error) throw error;
 
-        // In production, send email here
-        // For now, return the token (ONLY FOR DEVELOPMENT)
-        console.log(`Password reset token for ${email}: ${resetToken}`);
+        // Send actual email
+        await sendResetPasswordEmail(user.email, resetToken, user.name);
 
         res.json({
             message: 'If an account exists with this email, a password reset link has been sent.',
-            // Remove this in production:
-            devToken: resetToken
+            // Keep this for dev if needed, or remove it
+            devToken: process.env.NODE_ENV === 'production' ? undefined : resetToken
         });
 
     } catch (error: any) {

@@ -1,6 +1,7 @@
 import express from 'express';
 import { supabase } from '../db';
 import { z } from 'zod';
+import { sendWelcomeEmail } from '../utils/email';
 
 const router = express.Router();
 
@@ -72,6 +73,9 @@ router.post('/register', async (req, res) => {
             }]);
 
         if (insertError) throw insertError;
+
+        // Send welcome email (async, don't await to avoid slowing down response)
+        sendWelcomeEmail(email, name).catch(err => console.error('Error in sendWelcomeEmail background task:', err));
 
         res.status(201).json({ message: 'User created successfully' });
 
