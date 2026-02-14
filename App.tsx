@@ -40,6 +40,24 @@ const App: React.FC = () => {
     fetchJobs();
   }, [user]);
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [initialAuthMode, setInitialAuthMode] = useState<'login' | 'reset-password'>('login');
+  const [urlResetToken, setUrlResetToken] = useState('');
+
+  // Handle URL parameters for Password Reset
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('resetToken');
+    if (token) {
+      setUrlResetToken(token);
+      setInitialAuthMode('reset-password');
+      setIsAuthModalOpen(true);
+      // Clean the URL without reloading
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
+
   // Handle Payment Verification
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -144,7 +162,16 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      <Header currentView={currentView} onNavigate={setCurrentView} user={user} setUser={setUser} />
+      <Header
+        currentView={currentView}
+        onNavigate={setCurrentView}
+        user={user}
+        setUser={setUser}
+        isAuthModalOpen={isAuthModalOpen}
+        setIsAuthModalOpen={setIsAuthModalOpen}
+        initialAuthMode={initialAuthMode}
+        urlResetToken={urlResetToken}
+      />
       <main className="flex-grow">
         {currentView === 'SEARCH_HELPERS' ? <HelperSearchView user={user} onStartChat={handleStartChat} /> :
           currentView === 'SEARCH_JOBS' ? <JobSearchView jobs={jobs} user={user} onStartChat={handleStartChat} /> :

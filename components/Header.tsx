@@ -10,15 +10,28 @@ interface HeaderProps {
   onNavigate: (view: ViewState) => void;
   user: any;
   setUser: (user: any) => void;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (isOpen: boolean) => void;
+  initialAuthMode?: 'login' | 'reset-password';
+  urlResetToken?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser }) => {
+const Header: React.FC<HeaderProps> = ({
+  currentView,
+  onNavigate,
+  user,
+  setUser,
+  isAuthModalOpen,
+  setIsAuthModalOpen,
+  initialAuthMode = 'login',
+  urlResetToken = ''
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  // Remove local state: const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleLoginSuccess = (userData: any) => {
     setUser(userData);
-    setIsLoginModalOpen(false);
+    setIsAuthModalOpen(false);
   };
 
   const handleLogout = () => {
@@ -31,9 +44,11 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
   return (
     <>
       <AuthModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+        initialMode={initialAuthMode as any}
+        initialToken={urlResetToken}
       />
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,6 +119,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
               )}
 
               {user ? (
+                // ... user menu ...
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
@@ -123,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, user, setUser 
                 </div>
               ) : (
                 <button
-                  onClick={() => setIsLoginModalOpen(true)}
+                  onClick={() => setIsAuthModalOpen(true)}
                   className="text-gray-600 font-medium hover:text-blue-600 transition"
                 >
                   Login

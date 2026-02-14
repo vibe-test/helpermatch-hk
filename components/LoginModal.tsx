@@ -4,17 +4,39 @@ interface AuthModalProps {
     isOpen: boolean;
     onClose: () => void;
     onLoginSuccess: (user: any) => void;
+    initialMode?: AuthState;
+    initialToken?: string;
 }
 
 type AuthState = 'login' | 'register' | 'forgot-password' | 'reset-password';
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
-    const [authState, setAuthState] = useState<AuthState>('login');
+const AuthModal: React.FC<AuthModalProps> = ({
+    isOpen,
+    onClose,
+    onLoginSuccess,
+    initialMode = 'login',
+    initialToken = ''
+}) => {
+    const [authState, setAuthState] = useState<AuthState>(initialMode);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [role, setRole] = useState<'employer' | 'helper'>('employer');
-    const [resetToken, setResetToken] = useState('');
+    const [resetToken, setResetToken] = useState(initialToken);
+
+    // Update state when modal opens with new initial values
+    useEffect(() => {
+        if (isOpen) {
+            setAuthState(initialMode);
+            setResetToken(initialToken);
+            setEmail('');
+            setPassword('');
+            setName('');
+            setError('');
+            setMessage('');
+        }
+    }, [isOpen, initialMode, initialToken]);
+
     const [newPassword, setNewPassword] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
